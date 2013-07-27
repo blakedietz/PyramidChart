@@ -337,55 +337,55 @@ var gy 	= svg.append("g")
 				.style("font-size",yScale.rangeBand() + 2)
 				.style("renderStyle","crisp-edges");
 
-d3.select("input").on("change", change);
+// d3.select("input").on("change", change);
 
-  var sortTimeout = setTimeout(function() {
-    d3.select("input").property("checked", true).each(change);
-  }, 2000);
+//   var sortTimeout = setTimeout(function() {
+//     d3.select("input").property("checked", true).each(change);
+//   }, 2000);
 
-  function change() 
-  {
-    clearTimeout(sortTimeout);
+//   function change() 
+//   {
+//     clearTimeout(sortTimeout);
 
-    // Copy-on-write since tweens are evaluated after a delay.
-    var x0 = yScale.domain(
-    	data.sort(
-	    	this.checked
-			? function(a, b) 
-			{ 
-				if(a < 0 && B < 0)
-				{
-					return Math.abs(a.percentage) - Math.abs(b.percentage); 
-				}
-				return a.percentage - b.percentage;
-			}
-	        : function(a, b) 
-	        { 
-	        	return d3.ascending(b.percentage,a.percentage); 
-	        })
-	        .map(function(d) 
-	        { 
-	        	return d.state; 
-	    	})
-	)
-    .copy();
+//     // Copy-on-write since tweens are evaluated after a delay.
+//     var x0 = yScale.domain(
+//     	data.sort(
+// 	    	this.checked
+// 			? function(a, b) 
+// 			{ 
+// 				if(a < 0 && B < 0)
+// 				{
+// 					return Math.abs(a.percentage) - Math.abs(b.percentage); 
+// 				}
+// 				return a.percentage - b.percentage;
+// 			}
+// 	        : function(a, b) 
+// 	        { 
+// 	        	return d3.ascending(b.percentage,a.percentage); 
+// 	        })
+// 	        .map(function(d) 
+// 	        { 
+// 	        	return d.state; 
+// 	    	})
+// 	)
+//     .copy();
 
-    var transition = svg.transition().duration(750),
-        delay = function(d, i) 
-        { 
-        	return i * 50; 
-        };
+//     var transition = svg.transition().duration(750),
+//         delay = function(d, i) 
+//         { 
+//         	return i * 50; 
+//         };
 
-    // transition.selectAll("rect")
-    //     .delay(delay)
-    //     .attr("y", function(d) 
-    //     	{ 
-    //     		return x0(d.percentage); 
-    //     	});
+//     // transition.selectAll("rect")
+//     //     .delay(delay)
+//     //     .attr("y", function(d) 
+//     //     	{ 
+//     //     		return x0(d.percentage); 
+//     //     	});
 
-    transition.select(".y.axis")
-        .call(yAxis)
-      .selectAll("g")
-        .delay(delay);
-  };
+//     transition.select(".y.axis")
+//         .call(yAxis)
+//       .selectAll("g")
+//         .delay(delay);
+//   };
 
