@@ -1,18 +1,10 @@
 // Descending sort
 data.sort(function(a,b)
 {
-
 	return a.percentage < b.percentage ? -1 : a.percentage > b.percentage ? 1: 0;
-
-	if (a.percentage < b.percentage)
-		return -1;
-	else if (a.percentage > b.percentage)
-		return 1;
-	else 
-		return 0;
 });
 
-var margin = {top: 20, right: 100, bottom: 20, left: 100};
+var margin = {top: 0, right: 50, bottom: 20, left: 50};
 var width  = 500 - margin.right - margin.left; 
 var height = 650 - margin.top   - margin.bottom;
 
@@ -66,11 +58,11 @@ svg.selectAll("rect").data(data).enter().append("rect")
 		{
 			if(d.percentage < 0)
 			{
-				return "red";
+				return "#c33";
 			}
 			else
 			{
-				return "blue";
+				return "#16a";
 			}
 		}
 	})
@@ -99,11 +91,11 @@ var gy 	= svg.append("g")
 				{
 					if(data[i].percentage < 0)
 					{
-						return 9;
+						return 15;
 					}
 					else
 					{
-						return 9;
+						return 3;
 					}
 
 				})
