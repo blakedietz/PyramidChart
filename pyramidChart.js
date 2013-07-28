@@ -5,7 +5,7 @@ data.sort(function(a,b)
 });
 
 var margin = {top: 0, right: 50, bottom: 20, left: 50};
-var width  = 500 - margin.right - margin.left; 
+var width  = 650 - margin.right - margin.left; 
 var height = 650 - margin.top   - margin.bottom;
 
 var highestMagnitude = d3.max(data.map(function(d){return Math.abs(d.percentage);}));
@@ -13,7 +13,7 @@ var highestMagnitude = d3.max(data.map(function(d){return Math.abs(d.percentage)
 var xScaleLeft  = d3.scale.linear().domain([-highestMagnitude,0]).range([width/2,0]);
 var xScaleRight = d3.scale.linear().domain([0,highestMagnitude]).range([0,width/2]);
 
-var yScale      = d3.scale.ordinal().domain(data.map(function(d){return d.state;})).rangeRoundBands([margin.top,height - margin.bottom],.3);
+var yScale      = d3.scale.ordinal().domain(data.map(function(d){return d.state;})).rangeRoundBands([margin.top,height - margin.bottom],.4);
 
 var yAxis       = d3.svg.axis().scale(yScale).orient("left");
 
@@ -135,6 +135,10 @@ var gy 	= svg.append("g")
 				.attr("y",function(d,i)
 				{
 					return yScale(i) + yScale.rangeBand() / 2;
+				})
+				.attr("dx",function(d,i)
+				{
+					return data[i].percentage < 0 ? -5 :  5;
 				})
 				.attr("dy",3)
 				.style("font-family","sans-serif")
