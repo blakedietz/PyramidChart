@@ -85,6 +85,22 @@ function PyramidChart()
 		
 	};
 
+	chart.barColor = function(obj)
+	{
+		if(!arguments.length)
+		{
+			return {
+				"left": leftBarColor,
+				"right": rightBarColor
+			};
+		}
+		else
+		{
+			leftBarColor  = obj.left;
+			rightBarColor = obj.right;
+		}
+	};
+
 	// Helper Methods
 	chart.sort = function()
 	{
@@ -123,6 +139,41 @@ function PyramidChart()
 		yAxis       = d3.svg.axis().scale(yScale).orient("left");
 	};
 
+	chart.drawAxes = function()
+	{
+		gy 	= svg.append("g")
+			.attr("class", "y axis")
+			.attr("transform","translate(" + width/2 + ", 0)")
+			.call(yAxis)
+			.selectAll("text")
+				.style("text-anchor",function(d,i)
+				{
+					if(data[i].percentage < 0)
+					{
+						return "start";
+					}
+					else
+					{
+						return "end";
+					}
+				})
+				.attr("dx",function(d,i)
+				{
+					if(data[i].percentage < 0)
+					{
+						return 15;
+					}
+					else
+					{
+						return 3 ;
+					}
+
+				})
+				.attr("font-family","sans-serif")
+				.attr("font-size",yScale.rangeBand() + parseInt(.005 * width))
+				.attr("renderStyle","crisp-edges");
+	}
+
 	chart.drawBars = function()
 	{
 		svg.selectAll("rect").data(data).enter().append("rect")
@@ -150,7 +201,6 @@ function PyramidChart()
 					}
 					else
 					{
-						console.log(xScaleRight(d.percentage) + width/2)
 
 						return xScaleRight(d.percentage);
 					}
@@ -167,43 +217,7 @@ function PyramidChart()
 						return rightBarColor;
 					}
 				}
-			})
-			.on("mouseover",function(d)
-				{
-					console.log(d.state);
-				});
-
-			var gy 	= svg.append("g")
-			.attr("class", "y axis")
-			.attr("transform","translate(" + width/2 + ", 0)")
-			.call(yAxis)
-			.selectAll("text")
-				.style("text-anchor",function(d,i)
-				{
-					if(data[i].percentage < 0)
-					{
-						return "start";
-					}
-					else
-					{
-						return "end";
-					}
-				})
-				.attr("dx",function(d,i)
-				{
-					if(data[i].percentage < 0)
-					{
-						return 15;
-					}
-					else
-					{
-						return 3;
-					}
-
-				})
-				.style("font-family","sans-serif")
-				.style("font-size",yScale.rangeBand() +3)
-				.style("renderStyle","crisp-edges");
+			});
 	};
 
 	chart.moveLabels = function()
@@ -212,8 +226,11 @@ function PyramidChart()
 				.data(data)
 				.enter().append("text")
 				.attr("class","statePercentage")
-				.attr("transform","translate("+ width/2 +",0)")
-				.text(function(d){return d.percentage + "%";})
+				.attr("transform","translate(" + width/2 + ",0)")
+				.text(function(d)
+				{
+					return d.percentage + "%";
+				})
 				.style("text-anchor",function(d,i)
 				{
 					if(data[i].percentage < 0)
@@ -243,12 +260,18 @@ function PyramidChart()
 				})
 				.attr("dx",function(d,i)
 				{
-					return data[i].percentage < 0 ? -5 :  5;
+					return data[i].percentage < 0 ? (-.01 * width) :  (.01 * width);
 				})
-				.attr("dy",3)
-				.style("font-family","sans-serif")
-				.style("font-size",yScale.rangeBand() + 2)
-				.style("renderStyle","crisp-edges");
+				.attr("dy",.005 * width)
+				.attr("font-family","sans-serif")
+				.attr("font-size",parseInt(yScale.rangeBand()) + .005 * width)
+				.attr("renderStyle","crisp-edges");
+	};
+
+	chart.styleAxes = function()
+	{
+		// Remove large bar in the middle
+		svg.selectAll(".domain").attr("fill","none");
 	};
 
 	chart.draw = function()
@@ -256,7 +279,9 @@ function PyramidChart()
 		chart.createCanvas();
 		chart.createScales();
 		chart.createAxes();
+		chart.drawAxes();
 		chart.drawBars();
+		chart.styleAxes();
 		chart.moveLabels();
 	};
 
