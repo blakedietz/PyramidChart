@@ -1,77 +1,179 @@
-// Descending sort
-data.sort(function(a,b)
+function PyramidChart() 
 {
-	return a.percentage < b.percentage ? -1 : a.percentage > b.percentage ? 1: 0;
-});
+	var margin = {top: 0, right: 50, bottom: 20, left: 50};
+	var width  = 650 - margin.right - margin.left; 
+	var height = 650 - margin.top   - margin.bottom;
+	var selector = "body";
 
-var margin = {top: 0, right: 50, bottom: 20, left: 50};
-var width  = 650 - margin.right - margin.left; 
-var height = 650 - margin.top   - margin.bottom;
+	var xScaleLeft,
+		xScaleRight,
+		yScale;
 
-var highestMagnitude = d3.max(data.map(function(d){return Math.abs(d.percentage);}));
+	var highestMagnitude;
 
-var xScaleLeft  = d3.scale.linear().domain([-highestMagnitude,0]).range([width/2,0]);
-var xScaleRight = d3.scale.linear().domain([0,highestMagnitude]).range([0,width/2]);
+	var yAxis;
 
-var yScale      = d3.scale.ordinal().domain(data.map(function(d){return d.state;})).rangeRoundBands([margin.top,height - margin.bottom],.4);
+	var svg,
+		gy;
 
-var yAxis       = d3.svg.axis().scale(yScale).orient("left");
+	var data;
 
-var svg = d3.select("body")
+	var leftBarColor  = "#c33";
+	var rightBarColor = "#16a";
+
+	function chart()
+	{
+		
+	}
+
+	// Accessor Methods
+	chart.margin = function(obj)
+	{
+		if(!arguments.length)
+		{
+			return margin;
+		}
+		else
+		{	
+			margin = obj;
+		}
+	};
+
+	chart.width = function(w)
+	{
+		if(!arguments.length)
+		{
+			return width;
+		}
+		else
+		{
+			width = w - margin.right - margin.left;
+		}
+	};
+
+	chart.height = function(h)
+	{
+
+		if(!arguments.length)
+		{
+			return height;
+		}
+		else
+		{
+			height = h - margin.top - margin.bottom;
+		}
+	};
+
+	chart.data = function(d)
+	{
+		if(!arguments.length)
+		{
+			return data;
+		}
+		else
+		{
+			
+			data = d;
+
+			highestMagnitude = d3.max(data.map(function(d)
+				{
+					return Math.abs(d.percentage);
+				}));
+
+			chart.sort();
+		}
+		
+	};
+
+	// Helper Methods
+	chart.sort = function()
+	{
+		data.sort(function(a,b)
+		{
+			return a.percentage < b.percentage ? -1 : a.percentage > b.percentage ? 1: 0;
+		});
+	};
+
+	chart.createCanvas = function()
+	{
+		svg = d3.select(selector)
 			.append("svg")
 				.attr("height",height + margin.top  + margin.bottom)
 				.attr("width",width   + margin.left + margin.right)
 			.append("g")
 				.attr("transform","translate(" + margin.left + "," + margin.top + ")");
+	};
 
-svg.selectAll("rect").data(data).enter().append("rect")
-	.attr({
-		"x":function(d)
-		{
-			if(d.percentage < 0)
-			{
-				return width/2 - xScaleLeft(d.percentage);
-			}
-			else
-			{
-				return width/2;
-			}
-		},
-		"y":function(d)
-		{
-			return yScale(d.state);
-		},
-		"width":function(d)
-		{
-			if(d.percentage < 0)
-			{
-				return xScaleLeft(d.percentage);
-			}
-			else
-			{
-				console.log(xScaleRight(d.percentage) + width/2)
-				return xScaleRight(d.percentage);
-			}
-		} ,
-		"height":yScale.rangeBand(),
-		"fill":function(d)
-		{
-			if(d.percentage < 0)
-			{
-				return "#c33";
-			}
-			else
-			{
-				return "#16a";
-			}
-		}
-	})
-	.on("mouseover",function(d)
-		{
-			console.log(d.state);
-		});
-	
-var gy 	= svg.append("g")
+	chart.createScales = function()
+	{
+		xScaleLeft  = d3.scale.linear()
+						.domain([-highestMagnitude,0])
+						.range([width/2,0]);
+		xScaleRight = d3.scale.linear()
+						.domain([0,highestMagnitude])
+						.range([0,width/2]);
+		yScale      = d3.scale.ordinal()
+						.domain(data.map(function(d){return d.state;}))
+						.rangeRoundBands([margin.top,height - margin.bottom],.4);
+	};
+
+	chart.createAxes = function()
+	{
+		
+		yAxis       = d3.svg.axis().scale(yScale).orient("left");
+	};
+
+	chart.drawBars = function()
+	{
+		svg.selectAll("rect").data(data).enter().append("rect")
+			.attr({
+				"x":function(d)
+				{
+					if(d.percentage < 0)
+					{
+						return width/2 - xScaleLeft(d.percentage);
+					}
+					else
+					{
+						return width/2;
+					}
+				},
+				"y":function(d)
+				{
+					return yScale(d.state);
+				},
+				"width":function(d)
+				{
+					if(d.percentage < 0)
+					{
+						return xScaleLeft(d.percentage);
+					}
+					else
+					{
+						console.log(xScaleRight(d.percentage) + width/2)
+
+						return xScaleRight(d.percentage);
+					}
+				} ,
+				"height":yScale.rangeBand(),
+				"fill":function(d)
+				{
+					if(d.percentage < 0)
+					{
+						return leftBarColor;
+					}
+					else
+					{
+						return rightBarColor;
+					}
+				}
+			})
+			.on("mouseover",function(d)
+				{
+					console.log(d.state);
+				});
+
+			var gy 	= svg.append("g")
 			.attr("class", "y axis")
 			.attr("transform","translate(" + width/2 + ", 0)")
 			.call(yAxis)
@@ -102,12 +204,15 @@ var gy 	= svg.append("g")
 				.style("font-family","sans-serif")
 				.style("font-size",yScale.rangeBand() +3)
 				.style("renderStyle","crisp-edges");
+	};
 
-	svg.selectAll("text.statePercentage")
+	chart.moveLabels = function()
+	{
+		svg.selectAll("text.statePercentage")
 				.data(data)
 				.enter().append("text")
 				.attr("class","statePercentage")
-				.attr("transform","translate("+width/2+",0)")
+				.attr("transform","translate("+ width/2 +",0)")
 				.text(function(d){return d.percentage + "%";})
 				.style("text-anchor",function(d,i)
 				{
@@ -144,3 +249,17 @@ var gy 	= svg.append("g")
 				.style("font-family","sans-serif")
 				.style("font-size",yScale.rangeBand() + 2)
 				.style("renderStyle","crisp-edges");
+	};
+
+	chart.draw = function()
+	{
+		chart.createCanvas();
+		chart.createScales();
+		chart.createAxes();
+		chart.drawBars();
+		chart.moveLabels();
+	};
+
+	return chart;
+
+}
